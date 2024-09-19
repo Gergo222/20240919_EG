@@ -1,20 +1,40 @@
 const express = require("express");
+const connection = require("../../db");
 const router = express.Router();
 
 router.get("/", (req, res) => {
-    res.send("buildings get")
+    connection.query(
+        'SELECT * FROM buildings',
+        (err, result, fields) => {
+            if(err){
+                res.status(400).json(err)
+            }else{
+                res.json(result)
+            }
+        }
+    )
 })
 
 router.post("/create", (req, res) => {
-    res.send("buildings create")
+    const data = req.body;
+
+    if(data){
+        connection.query(
+            "INSERT INTO buildings(height, name) VALUES(?, ?)",
+            [data.height, data.name],
+            (err, result, fields) => {
+                if(err){
+                    res.status(400).json(err)
+                }else {
+                    res.json(result)
+                }
+            }
+        );
+    }else{
+        res.status(400).json("No data!")
+    }
 })
 
-router.put("/update/:id", (req, res) => {
-    res.send(`buildings update: ${req.params.id}`)
-})
 
-router.delete("/delete/:id", (req, res) => {
-    res.send(`buildings delete ${req.params.id}`)
-})
 
 module.exports = router;
